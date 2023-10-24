@@ -153,6 +153,7 @@ def Add():
 
 @app.route("/update/<int:sno>",methods=["GET","POST"])
 def Update(sno):
+    selected_date = request.args.get("date")
     if request.method == "POST":
         emp_id = request.form.get("emp_id")
         name = request.form.get("name")
@@ -196,7 +197,7 @@ def Update(sno):
         db.session.commit()
         return redirect("/")
     employee=Employee.query.filter_by(Sno=sno).first()
-    return render_template("update.html",employee=employee)
+    return render_template("update.html",employee=employee,selected_date=selected_date)
 
 @app.route("/delete/<int:sno>")
 def Delete(sno):
@@ -278,7 +279,7 @@ def bulk():
                 db.session.commit()
                 return redirect("/")            
 
-
+    
     return render_template("bulk.html")
     
 @app.route("/view/<int:sno>")

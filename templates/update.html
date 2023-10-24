@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='update.css') }}">
   </head>
   <body>
     <h1>Update </h1>
@@ -19,30 +21,58 @@
               <label for="name" class="form-label">Name:</label>
               <input type="text" class="form-control" value="{{ employee.Name | safe }}" name="name" id="name">
             </div>
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="designation" class="form-label">Designation:</label>
                 <input type="text" class="form-control"  value="{{employee.Designation | safe }}" name="designation" id="designation">
+            </div> -->
+            <div class="mb-3">
+              <label for="designation" class="form-label">Designation:</label>
+              <select name="designation" data-target="otherProjectField" class="form-select toggle-dropdown">
+                  <option value="Designation 1">Designation 1</option>
+                  <option value="Designation 2">Designation 2</option>
+                  <option value="Designation 3">Designation 3</option>
+              </select>
             </div>
             <div class="mb-3">
                 <label for="department" class="form-label">Department:</label>
                 <input type="text" class="form-control" value="{{employee.Department | safe}}" name="department" id="department">
             </div>  
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="project" class="form-label">Project:</label>
                 <input type="text" class="form-control" value="{{employee.Project | safe}}" name="project" id="project">
-            </div>   
+            </div>    -->
+            <div class="mb-3">
+              <label for="project" class="form-label">Project:</label>
+              <select name="project" data-target="otherProjectField" class="form-select toggle-dropdown">
+                  <option value="Project 1">Project 1</option>
+                  <option value="Project 2">Project 2</option>
+                  <option value="Project 3">Project 3</option>
+              </select>
+            </div>
             <div class="mb-3">
                 <label for="job_role" class="form-label">Job_role:</label>
                 <input type="text" class="form-control" value="{{employee.Job_role | safe}}" name="job_role" id="job_role">
             </div>    
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="employment_status" class="form-label">Employment_status:</label>
                 <input type="text" class="form-control" value="{{employee.Employment_status | safe}}" name="employment_status" id="employment_status">
-            </div> 
+            </div>  -->
             <div class="mb-3">
-                <label for="joining_date" class="form-label">Joining_date:</label>
-                <input type="date" class="form-control" value="{{employee.Joining_date | safe}}" name="joining_date" id="joining_date">
-            </div> 
+              <label for="employment_status" class="form-label">Employment status:</label>
+              <select name="employment_status" data-target="otherProjectField" class="form-select toggle-dropdown">
+                  <option value="Employment status 1">Employment status 1</option>
+                  <option value="Employment status 2">Employment status 2</option>
+                  <option value="Employment status 3">Employment status 3</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="joining_date" class="form-label">Joining_date:</label>
+              <div class="cont">
+                <input  type="date" class="form-control" value="{{employee.Joining_date}}" name="joining_date" id="joining_date">
+                
+              </div>
+            </div>
+          
             <!-- <div class="mb-3">
                 <label for="experience" class="form-label">Experience:</label>
                 <input type="text" class="form-control" value="{{employee.Experience | safe}}" name="experience" id="experience">
