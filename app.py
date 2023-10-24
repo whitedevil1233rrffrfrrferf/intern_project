@@ -281,6 +281,10 @@ def bulk():
 
     return render_template("bulk.html")
     
+@app.route("/view/<int:sno>")
+def view(sno):
+    data=Employee.query.filter_by(Sno=sno).first()
+    return render_template("view.html",data=data)    
 
 if __name__ == "__main__":
     app.run(debug=True)
