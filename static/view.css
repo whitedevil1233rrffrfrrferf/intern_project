@@ -8,3 +8,7 @@ a{
 .icon-2{
     color: black;
 }
+.filter{
+    display: flex;
+    justify-content: space-between;
+}

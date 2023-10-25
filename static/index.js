@@ -13,4 +13,45 @@ name.addEventListener("keyup", function(e) {
         }
     });
 });
+const selectedItem=document.getElementById("project")
+selectedItem.addEventListener("change",function(){
+    var searchContent=selectedItem.value.toLowerCase()
+    tableRows.forEach(function(row){
+        var projectCell=row.querySelector("#Project")
+        var projectValue=projectCell.textContent.toLowerCase();
+        if (projectValue.includes(searchContent)){
+            row.style.display="";
+        }else{
+            row.style.display="none"
+        }
+    })
+})
 
+const selectedDesignation=document.getElementById("designation")
+selectedDesignation.addEventListener("change",function(){
+    var searchContent=selectedDesignation.value.toLowerCase()
+    tableRows.forEach(function(row){
+        var designationCell=row.querySelector("#Designation")
+        var designationValue=designationCell.textContent.toLowerCase()
+        if (designationValue.includes(searchContent)){
+            row.style.display="";
+        }
+        else{
+            row.style.display="none"
+        }
+    })
+})
+const selectedEmploymentStatus=document.getElementById("employment_status")
+selectedEmploymentStatus.addEventListener("change",function(){
+    var searchContent=selectedEmploymentStatus.value.toLowerCase()
+    tableRows.forEach(function(row){
+        const employmentCell=row.querySelector("#employment_status")
+        const employmentValue=employmentCell.textContent.toLowerCase()
+        if (employmentValue.includes(searchContent)){
+            row.style.display="";
+        }
+        else{
+            row.style.display="none"
+        }
+    })
+})

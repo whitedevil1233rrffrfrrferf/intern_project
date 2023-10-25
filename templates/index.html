@@ -23,6 +23,33 @@
         </div>
       </nav>
     </div>
+    <h2>Search by filters:</h2>
+    <div class="container filter">
+      <div>
+        <label for="project" class="my-2">Project:</label>
+        <select name="project" id="project">
+          <option value="Project 1" class="dropdown_item">Project 1</option>
+          <option value="Project 2" class="dropdown_item">Project 2</option>
+          <option value="Bench" class="dropdown_item">Bench</option>
+        </select>
+      </div>
+      <div>
+        <label for="designation">Designation:</label>
+        <select name="designation" id="designation">
+          <option value="Sr. QA Engineer">Sr. QA Engineer</option>
+          <option value="QA Engineer">QA Engineer</option>
+          <option value="designation 1">Designation 1</option>
+        </select>
+      </div>
+      <div>
+        <label for="employment_status">Employment Status:</label>
+        <select name="employment_status" id="employment_status">
+          <option value="Billable">Billable</option>
+          <option value="Maternity">Maternity</option>
+          <option value="Employment status 1">Employment status 1</option>
+        </select>
+      </div>
+    </div>
     <h1><center>Employee's Data</center></h1>
     
       
@@ -51,11 +78,11 @@
             <th scope="row">{{loop.index}}</th>
             <td>{{employee.Emp_id}}</td>
             <td id="Name">{{employee.Name}}</td>
-            <td>{{employee.Designation}}</td>
+            <td id="Designation">{{employee.Designation}}</td>
             <td>{{employee.Department}}</td>
-            <td>{{employee.Project}}</td>
+            <td id="Project">{{employee.Project}}</td>
             <td>{{employee.Job_role}}</td>
-            <td>{{employee.Employment_status}}</td>
+            <td id="employment_status">{{employee.Employment_status}}</td>
             <td>{{employee.Joining_date}}</td>
             <td>{{employee.Experience}}</td>
             <td>{{employee.Location }}</td>
