@@ -1,3 +1,4 @@
+
 a{
     text-decoration: none;
     color:red;
@@ -11,4 +12,38 @@ a{
 .filter{
     display: flex;
     justify-content: space-between;
+    
+    padding: 5px;
+}
+.filters_title{
+    background-color:#1AACAC;
+    color:white;
+    text-align: center;
+    margin: 0;
+}
+.select_project{
+    color:#071952;
+}
+.title{
+    color:#00A9FF;
+    
+}
+.table.table{
+    background-color:#1AACAC;
+}
+.table .table_header {
+    background-color:#1AACAC;
+    color:white;
+    }
+    .table.table-primary {
+        background-color: #1AACAC !important ; /* Change the background color */
+        color: black !important ; /* Change the text color */
+        /* Add any other custom styling as needed */
+      }
+.label{
+    color:red;
+    font-size:20px;
+}     
+.btn{
+    color:whitesmoke;
 }
