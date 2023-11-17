@@ -1,11 +1,19 @@
-from flask import Flask, render_template,request,redirect
+from flask import Flask, render_template,request,redirect,url_for,jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import extract,func,or_
+from sqlalchemy.sql.expression import extract
 from openpyxl import load_workbook
 from datetime import date,datetime
+from dateutil.parser import parse
+import logging
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///employer.db"
+app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
+                                'delete_user':"sqlite:///delete.db"
+                                }
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SECRET_KEY'] = 'login_system'
+
 db = SQLAlchemy(app)
 
 class Employee(db.Model):
@@ -22,7 +30,16 @@ class Employee(db.Model):
     Location = db.Column(db.String(500))
     Last_promoted = db.Column(db.String(500))
     Comments = db.Column(db.String(500))
-
+class Login(db.Model):
+    __bind_key__="login"
+    id=db.Column(db.Integer,primary_key=True)
+    email=db.Column(db.String(500))
+    password=db.Column(db.String(200))
+class Delete_user(db.Model):
+    __bind_key__="delete_user"
+    id=db.Column(db.Integer,primary_key=True) 
+    Name=db.Column(db.String(200))
+    Date=db.Column(db.String(200))   
 def extract_data_from_excel():
     wb = load_workbook("employee_data 1.xlsx")
     ws = wb.active
@@ -97,7 +114,129 @@ def extract_data_from_excel():
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".",1)[1] in ["xlsx","csv"]
-@app.route("/")
+@app.route("/",methods=["GET","POST"])
+def signPage():
+    correct_user=None
+    error_message=None
+    if request.method=="POST":
+        email=request.form["email"]
+        password=request.form["password"]
+        correct_user=Login.query.filter_by(email=email).first()
+        if correct_user:
+            if correct_user.password==password:
+                return redirect(url_for("dashBoard"))
+            else:
+                correct_user=None
+                error_message="invalid login credentials"
+        if correct_user == None:
+                error_message="invalid login credentials"      
+    return render_template("sign.html",error_message=error_message)   
+@app.route("/dashboard")
+def dashBoard():
+    status=Employee.query.with_entities(Employee.Employment_status).distinct()
+    # for stat in status:
+    #     count = Employee.query.filter_by(Employment_status=stat.Employment_status).count()
+    #     print(f"Count for {stat.Employment_status}: {count}")
+    # joining_dates = Employee.query.with_entities(Employee.Joining_date).all()
+    # print(f"Joining dates: {joining_dates}")
+    
+    del_employers=Delete_user.query.all()
+    deleted_jan_employers=[]
+    deleted_feb_employers=[]
+    deleted_march_employers=[]
+    deleted_april_employers=[]
+    deleted_may_employers=[]
+    deleted_june_employers=[]
+    deleted_july_employers=[]
+    deleted_aug_employers=[]
+    deleted_sep_employers=[]
+    deleted_oct_employers=[]
+    deleted_nov_employers=[]
+    deleted_dec_employers=[]
+    for emp in del_employers:
+        if emp.Date:
+            split_date=emp.Date.split("-")
+            modified_month=split_date[1]
+            if modified_month=="01":
+                deleted_jan_employers.append(emp.Name) 
+            if modified_month=="02":
+                deleted_feb_employers.append(emp.Name) 
+            if modified_month=="03":
+                deleted_march_employers.append(emp.Name)
+            if modified_month=="04":
+                deleted_april_employers.append(emp.Name)
+            if modified_month=="05":
+                deleted_may_employers.append(emp.Name)                   
+            if modified_month=="06":
+                deleted_june_employers.append(emp.Name)
+            if modified_month=="07":
+                deleted_july_employers.append(emp.Name) 
+            if modified_month=="08":
+                deleted_aug_employers.append(emp.Name)
+            if modified_month=="09":
+                deleted_sep_employers.append(emp.Name)  
+            if modified_month=='10':
+                deleted_oct_employers.append(emp.Name)  
+            if modified_month=='11':
+                deleted_nov_employers.append(emp.Name)         
+            if modified_month=='12':
+                deleted_dec_employers.append(emp.Name)           
+                 
+                
+                
+    employers = Employee.query.all()
+    jan_employers=[]
+    feb_employers=[]
+    march_employers=[]
+    april_employers=[]
+    may_employers=[]
+    june_employers=[]
+    july_employers=[]
+    aug_employers=[]
+    sep_employers=[]
+    oct_employers=[]
+    nov_employers=[]
+    dec_employers=[]
+    for employee in employers:
+        if employee.Joining_date:
+            split_date = employee.Joining_date.split('-')
+            modified_month =split_date[1]
+            # print("split dates")
+            # print(modified_month)            
+            if modified_month =="01":
+                jan_employers.append(employee.Name)  
+            if modified_month =="02":
+                feb_employers.append(employee.Name)    
+            if modified_month =="03":
+                march_employers.append(employee.Name)
+            if modified_month =="04":
+                april_employers.append(employee.Name)           
+            if modified_month =="05":
+                may_employers.append(employee.Name)
+            if modified_month=='06':
+               june_employers.append(employee.Name) 
+            if modified_month=='07':
+               july_employers.append(employee.Name)      
+            if modified_month=='08':
+               aug_employers.append(employee.Name) 
+            if modified_month=='09':
+               sep_employers.append(employee.Name)
+            if modified_month=='10':
+               oct_employers.append(employee.Name)
+            if modified_month=='11':
+               nov_employers.append(employee.Name)
+            if modified_month=='12':
+               dec_employers.append(employee.Name)               
+    # print("june employers..")
+    # print(june_employers)
+
+    employment_status_counts={}
+    for stat in status:
+        count=Employee.query.filter_by(Employment_status=stat.Employment_status).count()
+        
+        employment_status_counts[stat.Employment_status]=count
+    return render_template("dashboard.html",employment_status_counts=employment_status_counts,june_employers=june_employers,deleted_june_employers=deleted_june_employers,deleted_jan_employers=deleted_jan_employers,deleted_feb_employers=deleted_feb_employers,deleted_march_employers=deleted_march_employers,deleted_april_employers=deleted_april_employers,deleted_may_employers=deleted_may_employers,deleted_july_employers=deleted_july_employers,deleted_aug_employers=deleted_aug_employers,deleted_sep_employers=deleted_sep_employers,deleted_oct_employers=deleted_oct_employers,deleted_nov_employers=deleted_nov_employers,deleted_dec_employers=deleted_dec_employers,jan_employers=jan_employers,feb_employers=feb_employers,march_employers=march_employers,april_employers=april_employers,may_employers=may_employers,july_employers=july_employers,aug_employers=aug_employers,sep_employers=sep_employers,oct_employers=oct_employers,nov_employers=nov_employers,dec_employers=dec_employers) 
+@app.route("/home")
 def Home():
     data=Employee.query.all()
     return render_template("index.html",data=data)
@@ -148,7 +287,7 @@ def Add():
             )
             db.session.add(employee)
             db.session.commit()
-        return redirect("/")
+        return redirect("/home")
     return render_template("add.html")
 
 @app.route("/update/<int:sno>",methods=["GET","POST"])
@@ -195,16 +334,19 @@ def Update(sno):
         employee.Comments=comments
         db.session.add(employee)
         db.session.commit()
-        return redirect("/")
+        return redirect("/home")
     employee=Employee.query.filter_by(Sno=sno).first()
     return render_template("update.html",employee=employee,selected_date=selected_date)
 
 @app.route("/delete/<int:sno>")
 def Delete(sno):
     employee=Employee.query.filter_by(Sno=sno).first()
+    delete=Delete_user(Name=employee.Name,Date=employee.Joining_date)
+    db.session.add(delete)
+    db.session.commit()
     db.session.delete(employee)
     db.session.commit()
-    return redirect("/")
+    return redirect("/home")
 with app.app_context():
         db.create_all()
         data=extract_data_from_excel()
@@ -277,7 +419,7 @@ def bulk():
                                     Comments=Comments)
                             db.session.add(employee)
                 db.session.commit()
-                return redirect("/")            
+                return redirect("/home")            
 
     
     return render_template("bulk.html")
@@ -286,6 +428,22 @@ def bulk():
 def view(sno):
     data=Employee.query.filter_by(Sno=sno).first()
     return render_template("view.html",data=data)    
+@app.route("/register",methods=["GET","POST"])
+def register():
+    if request.method=="POST":
+        email=request.form["email"]
+        password=request.form["password"]
+        user=Login(email=email,password=password)
+        db.session.add(user)
+        db.session.commit()
+        return redirect("/")
+
+    return render_template("register.html")
+@app.route("/get_employees_list/<employment_status>")
+def get_employees_list(employment_status):
+    employees=Employee.query.filter_by(Employment_status=employment_status).all()
+    employee_names=[employee.Name for employee in employees]
+    return jsonify({'employeeList': employee_names})
 
 if __name__ == "__main__":
     app.run(debug=True)
