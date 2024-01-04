@@ -30,6 +30,7 @@ a{
 }
 .table.table{
     background-color:#1AACAC;
+    border-spacing:40px;
 }
 .table .table_header {
     background-color:#1AACAC;
@@ -46,4 +47,52 @@ a{
 }     
 .btn{
     color:whitesmoke;
+}
+tbody tr.resigned-row {
+    background-color: red;
+  }
+/* Add this to your CSS file */
+.table-container {
+    margin: 20px;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+  }
+  
+  .highlighted-row tr.resigned {
+    background-color: red;
+  }
+  
+  /* Add more styles as needed */
+.select_month{
+    color: red;
+    font-size:20px;
+}  
+*{
+    margin: 0 ;
+}
+.main_div{
+    margin: 0%;
+    width:24%; 
+    height: 100%;
+    margin-right: 10px;
+    background-color:#4699F9;
+}
+.sidemenu_items{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    margin-bottom:74px;
+}
+.icon{
+    margin-right:30px;
+}
+.main_icon{
+    margin-left:10px;
+    margin-bottom:30px;
+}
+.first_div{
+    display: flex;
+}  
+a:hover {
+    color: #007bff; 
 }

@@ -1,18 +1,26 @@
-from flask import Flask, render_template,request,redirect,url_for,jsonify
+from flask import Flask, render_template,request,redirect,url_for,jsonify,send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import extract,func,or_
 from sqlalchemy.sql.expression import extract
 from openpyxl import load_workbook
 from datetime import date,datetime
 from dateutil.parser import parse
+from flask_migrate import Migrate
 import logging
+from werkzeug.utils import secure_filename
+import os
+import zipfile
+import shutil
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///employer.db"
 app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
-                                'delete_user':"sqlite:///delete.db"
+                                'delete_user':"sqlite:///delete.db",
+                                'resume':"sqlite:///resume.db",
+                                'intro':"sqlite:///intro.db"
                                 }
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['UPLOAD_FOLDER']='static/files'
 
 db = SQLAlchemy(app)
 
@@ -30,16 +38,33 @@ class Employee(db.Model):
     Location = db.Column(db.String(500))
     Last_promoted = db.Column(db.String(500))
     Comments = db.Column(db.String(500))
+    employee_status=db.Column(db.String(500))
+
+
 class Login(db.Model):
     __bind_key__="login"
     id=db.Column(db.Integer,primary_key=True)
     email=db.Column(db.String(500))
     password=db.Column(db.String(200))
+    
 class Delete_user(db.Model):
     __bind_key__="delete_user"
     id=db.Column(db.Integer,primary_key=True) 
     Name=db.Column(db.String(200))
     Date=db.Column(db.String(200))   
+class Resume(db.Model):
+    __bind_key__="resume"  
+    id=db.Column(db.Integer,primary_key=True)
+    filename=db.Column(db.String(255), nullable=False)  
+
+class Intro(db.Model):
+    __bind_key__="intro"
+    id=db.Column(db.Integer,primary_key=True)
+    Date=db.Column(db.String(200))
+    Status=db.Column(db.String(200))
+    Comments=db.Column(db.String(200))
+    resumeId=db.Column(db.Integer)    
+
 def extract_data_from_excel():
     wb = load_workbook("employee_data 1.xlsx")
     ws = wb.active
@@ -72,6 +97,7 @@ def extract_data_from_excel():
             Joining_date = row[column_mappings['Joining_date']]
             Experience = row[column_mappings['Experience']]
             formatted_date = None
+            
             if isinstance(Joining_date, datetime):
                 join_date = Joining_date 
                 formatted_date=join_date.strftime("%d-%m-%Y")
@@ -108,12 +134,16 @@ def extract_data_from_excel():
                                     Department=Department, Project=Project, Job_role=Job_role,
                                     Employment_status=Employment_status, Joining_date=formatted_date,
                                     Experience=Experience, Location=Location, Last_promoted=Last_promoted,
-                                    Comments=Comments)
+                                    Comments=Comments,employee_status="active")
                 db.session.add(employee)
     db.session.commit()
-
+    
+    db.session.commit()
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".",1)[1] in ["xlsx","csv"]
+
+def allowed_files(filename):
+    return "." in filename and filename.rsplit(".",1)[1].lower() in ["pdf" , "csv"]
 @app.route("/",methods=["GET","POST"])
 def signPage():
     correct_user=None
@@ -269,6 +299,7 @@ def Add():
         location = request.form.get("location")
         last_promoted = request.form.get("last_promoted")
         comments = request.form.get("comments")
+        employee_status=request.form.get("status")
         existing_data=Employee.query.filter_by(Name=name).first()
         if not existing_data:
             employee = Employee(
@@ -283,7 +314,8 @@ def Add():
                 Experience=experience,
                 Location=location,
                 Last_promoted=last_promoted,
-                Comments=comments
+                Comments=comments,
+                employee_status=employee_status
             )
             db.session.add(employee)
             db.session.commit()
@@ -319,6 +351,7 @@ def Update(sno):
         location = request.form.get("location")
         last_promoted = request.form.get("last_promoted")
         comments = request.form.get("comments")
+        employee_status=request.form.get("status")
         employee=Employee.query.filter_by(Sno=sno).first()
         employee.Emp_id=emp_id
         employee.Name=name
@@ -332,6 +365,7 @@ def Update(sno):
         employee.Location=location
         employee.Last_promoted=last_promoted
         employee.Comments=comments
+        employee.employee_status=employee_status
         db.session.add(employee)
         db.session.commit()
         return redirect("/home")
@@ -410,13 +444,14 @@ def bulk():
                         Location = row[column_mappings['Location']]
                         Last_promoted = row[column_mappings['Last_promoted']]
                         Comments = row[column_mappings['Comments']]
+                        employee_status="active"
                         existing_data=Employee.query.filter_by(Name=Name).first()
                         if not existing_data:
                             employee = Employee(Emp_id=Emp_id, Name=Name, Designation=Designation,
                                     Department=Department, Project=Project, Job_role=Job_role,
                                     Employment_status=Employment_status, Joining_date=formatted_date,
                                     Experience=Experience, Location=Location, Last_promoted=Last_promoted,
-                                    Comments=Comments)
+                                    Comments=Comments,employee_status=employee_status)
                             db.session.add(employee)
                 db.session.commit()
                 return redirect("/home")            
@@ -444,6 +479,95 @@ def get_employees_list(employment_status):
     employees=Employee.query.filter_by(Employment_status=employment_status).all()
     employee_names=[employee.Name for employee in employees]
     return jsonify({'employeeList': employee_names})
+
+@app.route("/resume",methods=["GET","POST"])
+def resume():
+    if request.method=="POST":
+        selected_tag=request.form['tag']
+        files=request.files.getlist('file')
+        for file in files:
+            if file and allowed_files(file.filename):
+                filename=secure_filename(file.filename)
+                new_filename=f"{selected_tag}_{filename}"
+                target_path=os.path.join(app.config['UPLOAD_FOLDER'],new_filename)
+                if not os.path.exists(target_path):
+                    file.save(target_path)
+                    resume=Resume(filename=new_filename)
+                    db.session.add(resume)
+                    db.session.commit()
+        return redirect(url_for('resume'))        
+    return render_template("resume.html")
+
+@app.route("/employee_management")
+def employee():
+    resumes=Resume.query.all()
+    return render_template("employee.html",resumes=resumes)
+
+@app.route("/view_resume/<filename>")
+def view_resume(filename):
+    resume_folder='static/files'
+    return send_from_directory(resume_folder,filename)
+
+@app.route("/zip",methods=["GET","POST"])
+def zip():
+    if request.method=="POST":
+        
+        zip_files=request.files.getlist('zipFiles')
+        selected_tag=request.form['tag']
+        for zip_file in zip_files:
+            if zip_file and zip_file.filename.endswith('.zip'):
+                temp_dir="temp_dir"
+                os.makedirs(temp_dir,exist_ok=True)
+                try:
+                    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                        zip_ref.extractall(temp_dir)
+                    
+                    for root,dirs,files in os.walk(temp_dir):
+                        for filename in files:
+                            file_path = os.path.join(root, filename)
+                            if allowed_files(filename):
+                                tag_filename=f"{selected_tag}_{filename}"
+                                target_path=os.path.join(app.config['UPLOAD_FOLDER'], tag_filename)
+                                print("File")
+                                if not os.path.exists(target_path):
+                                    shutil.move(file_path,target_path)
+                                    resume=Resume(filename=tag_filename)
+                                    db.session.add(resume)
+                                    db.session.commit()
+
+                                    
+                finally:
+                    shutil.rmtree(temp_dir)   
+
+        return redirect(url_for('employee'))            
+    return render_template("zip.html")
+
+@app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
+def introCall(resume_id):
+    resume=Resume.query.get(resume_id)
+    if request.method == 'POST':
+        
+        print(resume_id)
+        date=request.form["date"]
+        status=request.form["status"]
+        comments=request.form["comments"]
+        entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id)
+        db.session.add(entry)
+        db.session.commit()
+    return render_template("intro.html",resume=resume)
+
+@app.route("/interview1")
+def interview1():
+    return render_template("interview1.html")
+
+@app.route("/interview2")
+def interview2():
+    return render_template("interview2.html")
+
+@app.route("/introv",methods=["GET","POST"])
+def introv():
+    if request.method=="POST":
+        return render_template("introv.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

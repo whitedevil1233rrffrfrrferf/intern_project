@@ -59,9 +59,12 @@
             <div class="mb-3 label">
               <label for="employment_status" class="form-label">Employment status:</label>
               <select name="employment_status" data-target="otherProjectField" class="form-select toggle-dropdown">
-                  <option value="Employment status 1">Employment status 1</option>
-                  <option value="Employment status 2">Employment status 2</option>
-                  <option value="Employment status 3">Employment status 3</option>
+                <option value="Billable">Billable</option>
+                <option value="Maternity">Maternity</option>
+                <option value="Trainee">Trainee</option>
+                <option value="Backup">Backup</option>
+                <option value="Bench">Bench</option>
+                <option value="Long term leave">Long term leave</option>
               </select>
             </div>
             <div class="mb-3 label">
@@ -74,7 +77,12 @@
             </div>  -->
             <div class="mb-3 label">
                 <label for="location" class="form-label">Location:</label>
-                <input type="text" class="form-control" name="location" id="location">
+                <select name="location" data-target="otherLocationField" class="form-select toggle-dropdown">
+                  <option value="Kollu">Kollu</option>
+                  <option value="Kaup">Kaup</option>
+                  <option value="Chennai">Chennai</option>
+                  <option value="TN palyam">TN palyam</option>
+                </select>
             </div> 
             
             <div class="mb-3 label">
@@ -85,6 +93,14 @@
                 <label for="comments" class="form-label">Comments:</label>
                 <input type="text" class="form-control" name="comments" id="comments">
             </div> 
+            <div class="mb-3 label">
+              <label for="status" class="form-label">Status:</label>
+              <select name="status" data-target="otherStatusField" class="form-select toggle-dropdown">
+                <option value="active">Active</option>
+                <option value="resigned">Resigned</option>
+                
+            </select>
+          </div> 
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
     </div> 

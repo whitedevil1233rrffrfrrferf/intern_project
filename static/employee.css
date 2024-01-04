@@ -1,0 +1,25 @@
+*{
+    margin: 0 ;
+}
+.main_div{
+    margin: 0%;
+    width:24%; 
+    height: 100%;
+    background-color:#4699F9;
+}
+.sidemenu_items{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    margin-bottom:74px;
+}
+.icon{
+    margin-right:30px;
+}
+.main_icon{
+    margin-left:10px;
+    margin-bottom:30px;
+}
+.first_div{
+    display: flex;
+}

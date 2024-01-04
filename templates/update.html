@@ -59,10 +59,13 @@
             </div>  -->
             <div class="mb-3 label">
               <label for="employment_status" class="form-label">Employment status:</label>
-              <select name="employment_status" data-target="otherProjectField" class="form-select toggle-dropdown">
-                  <option value="Employment status 1">Employment status 1</option>
-                  <option value="Employment status 2">Employment status 2</option>
-                  <option value="Employment status 3">Employment status 3</option>
+              <select name="employment_status" data-target="otherProjectField" id="employment_status" class="form-select toggle-dropdown">
+                <option value="Billable">Billable</option>
+                <option value="Maternity">Maternity</option>
+                <option value="Trainee">Trainee</option>
+                <option value="Backup">Backup</option>
+                <option value="Bench">Bench</option>
+                <option value="Long term leave">Long term leave</option>
               </select>
             </div>
             <div class="mb-3 label">
@@ -79,7 +82,12 @@
             </div>  -->
             <div class="mb-3 label">
                 <label for="location" class="form-label">Location:</label>
-                <input type="text" class="form-control" value="{{employee.Location | safe}} "name="location" id="location">
+                <select name="location" data-target="otherLocationField" id="location" class="form-select toggle-dropdown">
+                  <option value="Kollu">Kollu</option>
+                  <option value="Kaup">Kaup</option>
+                  <option value="Chennai">Chennai</option>
+                  <option value="TN palyam">TN palyam</option>
+                </select>
             </div> 
             <div class="mb-3 label">
                 <label for="last_promoted" class="form-label">Last_promoted:</label>
@@ -88,6 +96,13 @@
             <div class="mb-3 label">
                 <label for="comments" class="form-label">Comments:</label>
                 <input type="text" class="form-control" value="{{employee.Comments | safe}}" name="comments" id="comments">
+            </div>
+            <div class="mb-3 label">
+              <label for="status" class="form-label">status:</label>
+              <select name="status" data-target="otherProjectField" id="status" class="form-select toggle-dropdown">
+                  <option value="active">active</option>
+                  <option value="resigned">resigned</option>
+              </select>
             </div> 
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
