@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='employee.css') }}">
 </head>
 <body>
+    
     <div class="first_div">
-        <div class="main_div">
-      
+        <div class="main_div" ">
+            
             <i class="fa-solid fa-bars fa-2x main_icon"></i>
             <a href="/home"><div class="sidemenu_items">
                 <i class="fa-solid fa-house fa-2x icon"></i>
@@ -49,10 +50,42 @@
         </div>
 
         <div class="container">
-            <h1 style=" background-color:#1AACAC;color: white;text-align: center;">Employee resumes</h1>
+            <div class="filters" style="margin-bottom: 20px;">
+                <h1 style="text-align: center;  background-color:#1AACAC;color: white">Search by filters:</h1>
+                <div class="flex" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                        <label for="introFilter" style="font-size: 20px; color: red;">Intro Call Status:</label>
+                        <select  id="introFilter" onchange="filterTableByIntroStatus()" style="margin-bottom: 20px; margin-top: 20px;">
+                            <option value=""></option>
+                            <option value="Move to Interview 1">Accepted</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="Intro call not conducted">Not conducted</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                        <label for="interview1Filter" style="font-size: 20px;color: red;">Interview 1 Status:</label>
+                        <select id="interview1Filter" onchange="filterTableByInterview1Status()" style="margin-bottom: 20px; margin-top: 20px;">
+                            <option value=""></option>
+                            <option value="Move to Interview 2">Accepted</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="Interview 1 not conducted">Not conducted</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                        <label for="interview2Filter" style="font-size: 20px; color: red;">Interview 2 Status:</label>
+                        <select id="interview2Filter" onchange="filterTableByInterview2Status()" style="margin-bottom: 20px; margin-top: 20px;">
+                            <option value=""></option>
+                            <option value="Move to HR round">Accepted</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="Interview 2 not conducted">Not conducted</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <h1 style=" background-color:#1AACAC;color: white;text-align: center; margin-top: 20px;">Employee resumes</h1>
             
             
-            <div class="table-responsive my-4">
+            <div class="table-responsive my-4" >
                 <table class="table table-striped table-bordered">
                     <thead class="thead-dark">
                         <tr>
@@ -65,30 +98,37 @@
                             <th scope="col">Expected CTC</th>
                             <th scope="col">Location</th>
                             <th scope="col">Action</th>
-                            <th scope="col">introcall</th>
-                            <th scope="col">Interview 1</th>
-                            <th scope="col">Interview 2</th>
+                            <th scope="col">Interview Details</th>
+                            <th scope="col" hidden>intro status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for resume in resumes %}
                             <tr>
                                 <td>{{ resume.id }}</td>
-                                <td>{{ resume.filename }}</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td><a href="{{ url_for('view_resume', filename=resume.filename) }}" class="btn btn-primary mx-1">View</a>
-                                    <a href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2">Intro call</a>
-                                    <a href="{{ url_for('interview1', resume_id=resume.id) }}" class="btn btn-primary  ">Interview 1</a>
-                                    <a href="{{ url_for('interview2', resume_id=resume.id) }}" class="btn btn-primary my-3">Interview 2</a>
+                                <td>
+                                    <a href="{{ url_for('view_resume', filename=resume.filename) }}"  style="font-size: 22px;">{{ resume.filename }}</a>
+                                    <a href="#" style="font-size: 32px; margin-left: 20px; color: red;" onclick="getInterviewStatus({{resume.id}})"> !</a>
+                                    <div id="toggle{{ resume.id }}" style="display: none;">
+                                        <div id="introStatus{{ resume.id }}" style="margin-bottom: 3px; margin-top:5px;"></div>
+                                        <div id="interview1Status{{ resume.id }}" style="margin-bottom: 3px;"></div>
+                                        <div id="interview2Status{{ resume.id }}" style="margin-bottom: 3px;"></div>
+                                    </div>
                                 </td>
-                               <td><a href="/introcallv" class="btn btn-primary mx-1">view</a></td>
-                               <td><a href="/interview1v" class="btn btn-primary mx-1">view</a></td>
-                               <td><a href="/interview2v" class="btn btn-primary mx-1">view</a></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <a href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2">Intro call</a>
+                                    <a href="{{ url_for('interview1v', resume_id=resume.id) }}" class="btn btn-primary">Interview 1</a>
+                                    <a href="{{ url_for('interview2v', resume_id=resume.id) }}" class="btn btn-primary my-3">Interview 2</a>
+                                    <a href="{{ url_for('hr', resume_id=resume.id) }}" class="btn btn-primary my-3">HR round</a>
+                                </td>
+                               <td><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1">view</a></td>
+                               <td id="intro_status" data-resume-id="{{ resume.id }}" hidden></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -100,6 +140,6 @@
     
     
        
-    
+    <script src="{{ url_for('static', filename='employee.js') }}"></script>
 </body>
 </html>

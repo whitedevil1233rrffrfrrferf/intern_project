@@ -7,7 +7,8 @@ selectBtn.addEventListener("click",()=>{
 })   
 
 items.forEach(item => {
-    item.addEventListener("click",()=>{
+    item.addEventListener("click",(event)=>{
+        event.preventDefault();
         item.classList.toggle("checked");
         let checked=document.querySelectorAll(".checked")
         
@@ -24,5 +25,7 @@ items.forEach(item => {
 });
 
 function updateSelectedPanelInput(){
-    const selectedPanelInput=document.getElementById()
+    const selectedPanelInput=document.getElementById("selectedPanel")
+    selectedPanelInput.value = selectedPanel.join(', ');
+    console.log(selectedPanelInput.value)
 }

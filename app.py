@@ -16,7 +16,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///employer.db"
 app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
                                 'delete_user':"sqlite:///delete.db",
                                 'resume':"sqlite:///resume.db",
-                                'intro':"sqlite:///intro.db"
+                                'intro':"sqlite:///intro.db",
+                                'interview1':"sqlite:///interview1.db",
+                                'interview2':"sqlite:///interview2.db",
+                                'hr':"sqlite:///hr.db"
                                 }
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -63,7 +66,35 @@ class Intro(db.Model):
     Date=db.Column(db.String(200))
     Status=db.Column(db.String(200))
     Comments=db.Column(db.String(200))
-    resumeId=db.Column(db.Integer)    
+    resumeId = db.Column(db.Integer)  
+    SelectedPanel=db.Column(db.String(200))  
+
+class Interview1(db.Model):
+    __bind_key__="interview1" 
+    id=db.Column(db.Integer,primary_key=True)
+    Date=db.Column(db.String(200))
+    Status=db.Column(db.String(200))
+    Comments=db.Column(db.String(200))
+    resumeId=db.Column(db.Integer)  
+    SelectedPanel=db.Column(db.String(200))     
+
+class Interview2(db.Model):
+    __bind_key__="interview2" 
+    id=db.Column(db.Integer,primary_key=True)
+    Date=db.Column(db.String(200))
+    Status=db.Column(db.String(200))
+    Comments=db.Column(db.String(200))
+    resumeId=db.Column(db.Integer)  
+    SelectedPanel=db.Column(db.String(200))    
+
+class Hr(db.Model):
+    __bind_key__="hr" 
+    id=db.Column(db.Integer,primary_key=True)
+    Date=db.Column(db.String(200))
+    Status=db.Column(db.String(200))
+    Comments=db.Column(db.String(200))
+    resumeId=db.Column(db.Integer)  
+    SelectedPanel=db.Column(db.String(200))        
 
 def extract_data_from_excel():
     wb = load_workbook("employee_data 1.xlsx")
@@ -547,11 +578,12 @@ def introCall(resume_id):
     resume=Resume.query.get(resume_id)
     if request.method == 'POST':
         
-        print(resume_id)
+        # print(resume_id)
         date=request.form["date"]
         status=request.form["status"]
         comments=request.form["comments"]
-        entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id)
+        selected_panel=request.form["selectedPanel"]
+        entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
         db.session.add(entry)
         db.session.commit()
     return render_template("intro.html",resume=resume)
@@ -568,6 +600,67 @@ def interview2():
 def introv():
     if request.method=="POST":
         return render_template("introv.html")
+
+@app.route("/resume_details/<int:resume_id>")
+def resume_details(resume_id):
+    resume=Resume.query.get(resume_id)
+    intro_call=Intro.query.filter_by(resumeId=resume_id).first()
+    interview1=Interview1.query.filter_by(resumeId=resume_id).first()
+    interview2=Interview2.query.filter_by(resumeId=resume_id).first()
+    hr=Hr.query.filter_by(resumeId=resume_id).first()
+    return render_template("resume_details.html",resume=resume,intro_call=intro_call,interview1=interview1,interview2=interview2,hr=hr)
+
+@app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
+def interview1v(resume_id):
+    resume=Resume.query.get(resume_id)
+    if request.method=="POST":
+        date=request.form["date"]
+        comments=request.form["comments"]
+        status=request.form["status"]
+        
+        selected_panel=request.form["selectedPanel"]
+        entry=Interview1(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+        db.session.add(entry)
+        db.session.commit()
+    resume = Resume.query.get(resume_id)
+    return render_template("interview1.html", resume=resume)
+
+@app.route("/interview2v/<int:resume_id>",methods=["GET", "POST"])
+def interview2v(resume_id):
+    resume=Resume.query.get(resume_id)
+    if request.method=="POST":
+        
+        date=request.form["date"]
+        comments=request.form["comments"]
+        status=request.form["status"]
+        selected_panel=request.form["selectedPanel"]
+        entry=Interview2(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+        db.session.add(entry)
+        db.session.commit()
+    return render_template("interview2.html",resume=resume)
+
+@app.route("/hr/<int:resume_id>",methods=["GET", "POST"])
+def hr(resume_id):
+    resume=Resume.query.get(resume_id)
+    if request.method=="POST":
+        date=request.form["date"]
+        comments=request.form["comments"]
+        status=request.form["status"]
+        selected_panel=request.form["selectedPanel"]
+        entry=Hr(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+        db.session.add(entry)
+        db.session.commit()
+    return render_template("hr.html",resume=resume)
+
+@app.route("/get_interview_status/<int:resume_id>")
+def get_intro_status(resume_id):
+    intro=Intro.query.filter_by(resumeId=resume_id).first()
+    interview1=Interview1.query.filter_by(resumeId=resume_id).first()
+    interview2=Interview2.query.filter_by(resumeId=resume_id).first()
+    intro_status=intro.Status if intro else "Intro call not conducted"
+    interview1_status=interview1.Status if interview1 else "Interview 1 not conducted"
+    interview2_status=interview2.Status if interview2 else "Interview 2 not conducted"
+    return jsonify({'intro_status':intro_status,'interview1_status': interview1_status,'interview2_status':interview2_status}) 
 
 if __name__ == "__main__":
     app.run(debug=True)

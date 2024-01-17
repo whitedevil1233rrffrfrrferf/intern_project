@@ -119,7 +119,7 @@
           </div>
     
           <div>
-            <label for="month_active_filter" class="select_month">Month</label>
+            <label for="month_active_filter" class="select_month label">Month</label>
             <select name="month_active" id="month_active_filter" class="select_month_value" onchange="filterByMonth('active')">
               <option></option>
               <option value="january" class="month_value">January</option>
@@ -138,42 +138,15 @@
           </div>
           
           <div>
-            <label for="month_active_month_filter" class="select_month">Month + active:</label>
-            <select name="month_active_month_filter" id="month_active_month_filter" class="select_month_value" onchange="month_active_resigned('active')">
-              <option></option>
-              <option value="january" class="month_value">January</option>
-              <option value="february" class="month_value">February</option>
-              <option value="march" class="month_value">March</option>
-              <option value="april" class="month_value">April</option>
-              <option value="may" class="month_value">May</option>
-              <option value="june" class="month_value">June</option>
-              <option value="july" class="month_value">July</option>
-              <option value="august" class="month_value">August</option>
-              <option value="september" class="month_value">September</option>
-              <option value="october" class="month_value">October</option>
-              <option value="november" class="month_value">November</option>
-              <option value="december" class="month_value">December</option>
-              </select>
+            <label for="month_active" class="label" >Month + active</label>
+            <input type="date" id="month_active_datepicker" oninput="filter('active')">
           </div>
     
           <div>
-            <label for="month_resigned_month_filter" class="select_month">Month + resigned:</label>
-            <select name="month_active" id="month_resigned_month_filter" class="select_month_value" onchange="month_active_resigned('resigned')">
-              <option></option>
-              <option value="january" class="month_value">January</option>
-              <option value="february" class="month_value">February</option>
-              <option value="march" class="month_value">March</option>
-              <option value="april" class="month_value">April</option>
-              <option value="may" class="month_value">May</option>
-              <option value="june" class="month_value">June</option>
-              <option value="july" class="month_value">July</option>
-              <option value="august" class="month_value">August</option>
-              <option value="september" class="month_value">September</option>
-              <option value="october" class="month_value">October</option>
-              <option value="november" class="month_value">November</option>
-              <option value="december" class="month_value">December</option>
-              </select>
+            <label for="month_resigned"   class="label">Month + Resigned</label>
+            <input type="date" id="month_resigned_datepicker" oninput="filters('resigned')">
           </div>
+    
     
         </div>
         <h1 class="title my-2"><center>Employee's Data</center></h1>
