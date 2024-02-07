@@ -11,9 +11,9 @@ a{
 }
 .filter{
     display: flex;
-    justify-content: space-between;
-    
-    padding: 5px;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
 }
 .filters_title{
     background-color:#1AACAC;
@@ -42,7 +42,7 @@ a{
         /* Add any other custom styling as needed */
       }
 .label{
-    color:red;
+    color:#00A9FF;
     font-size:20px;
 }     
 .btn{
@@ -81,10 +81,15 @@ tbody tr.resigned-row {
     display: flex;
     align-items: center;
     justify-content:center;
-    margin-bottom:74px;
+    margin-bottom:40px;
+}
+.sidemenu_items:hover{
+    transform: scale(0.9);
+    backface-visibility: hidden;
 }
 .icon{
     margin-right:30px;
+    color: white;
 }
 .main_icon{
     margin-left:10px;

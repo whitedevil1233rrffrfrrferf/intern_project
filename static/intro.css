@@ -81,6 +81,7 @@
     font-size: 16px;
     font-weight: 400;
     color: #333;
+    
 }
 .select-btn.open ~ .list-items{
     display: block;
@@ -104,4 +105,19 @@ a{
 }
 a:hover {
     color: #007bff; 
+}
+.item-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width:900px; /* Adjust the width as needed */
+}
+
+.item-text {
+    flex-grow: 1;
+}
+
+.delete-btn:hover{
+    background-color: grey;
+    transform: scale(1.1);
 }

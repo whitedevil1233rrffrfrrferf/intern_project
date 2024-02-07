@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Intro details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='intro.css') }}">
   </head>
 <body>
@@ -17,12 +18,14 @@
               <div style=" margin-bottom:40px;">
                 <div class="mb-3 select-btn">
                   <label for="calledBy" class="form-label btn-text" >Select panel</label>
+                  <!-- <input type="text" id="newPerson" placeholder="Add a person">
+                  <button type="button" onclick="addPerson()">Add</button> -->
                   <span class="arrow-dwn">
                     <i class="fa-solid fa-chevron-down"></i>
                   </span>
-                  
-              </div>
-                <ul class="list-items">
+                 
+                </div>
+                <ul id="panelList" class="list-items">
                   <li class="items">
                     <span class="checkbox">
                       <i class="fa-solid fa-check check-icon"></i>
@@ -30,13 +33,15 @@
                     <span class="item-text">
                       Person 1
                     </span>
+                   
                   </li>
+                  <!-- this is the new li item                   -->
                   <li class="items">
                     <span class="checkbox">
                       <i class="fa-solid fa-check check-icon"></i>
                     </span>
                     <span class="item-text">
-                      Person 2
+                      Person 2 
                     </span>
                   </li>
                   <li class="items">
@@ -47,7 +52,13 @@
                       Person 3
                     </span>
                   </li>
+                  
                 </ul>
+                <div >
+                  <input type="text" id="newPersonInput" placeholder="Add a new panel" style="margin-top:20px; width: 20rem; height:2rem; border: 1px solid black ; border-radius:2px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); outline: none; color: black; padding: 10px; font-size: 1em;">
+                  <button id="addPersonBtn" class="btn btn-dark">Add</button>
+                  
+              </div>
               </div>
                 <div class="mb-3">
                   <label for="date" class="form-label"  style="font-size:20px; color:#1AACAC;">Date</label>
@@ -80,6 +91,14 @@
                 <button type="submit" class="btn btn-primary" style="margin-top:30px;">Submit</button>
               </form>
         </div>
+        <a class="btn btn-primary" href="/employee_management" style="color:white; padding:10px ;margin-top:10px; margin-left:370px;"><div style="display: flex; justify-content: space-between; padding:5px;">
+          <div>
+            <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
+          </div>
+          <div>
+            Back
+          </div>
+        </div></a>
       </div>
       <script src="{{ url_for('static', filename='intro.js') }}"></script> 
 </body>

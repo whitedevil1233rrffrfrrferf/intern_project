@@ -1,20 +1,24 @@
 function toggleEmployeesList(employment_status){
-    var lastDiv=document.getElementById("employeeList-" + employment_status)
-    lastDiv.innerHTML='';
-    if (lastDiv.style.display=="none"){
-        fetch("/get_employees_list/"+employment_status)
-        .then(response=>response.json())
-        .then(data=>{
-            lastDiv.innerHTML=data.employeeList.map(name=>name+'<br>').join("")
-            lastDiv.style.display="block";
+    var employeeListUrl = "/get_employees_list/" + employment_status;
+
+    
+    window.location.href = employeeListUrl;
+    // var lastDiv=document.getElementById("employeeList-" + employment_status)
+    // lastDiv.innerHTML='';
+    // if (lastDiv.style.display=="none"){
+    //     fetch("/get_employees_list/"+employment_status)
+    //     .then(response=>response.json())
+    //     .then(data=>{
+    //         lastDiv.innerHTML=data.employeeList.map(name=>name+'<br>').join("")
+    //         lastDiv.style.display="block";
             
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }else{
-        lastDiv.style.display="none";
-    }
+    //     })
+    //     .catch(error => {
+    //         console.error('Error:', error);
+    //     });
+    // }else{
+    //     lastDiv.style.display="none";
+    // }
 }
 const employers=document.getElementById("employers")
 function handleChange(){

@@ -174,7 +174,7 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".",1)[1] in ["xlsx","csv"]
 
 def allowed_files(filename):
-    return "." in filename and filename.rsplit(".",1)[1].lower() in ["pdf" , "csv"]
+    return "." in filename and filename.rsplit(".",1)[1].lower() in ["pdf" , "csv","doc","docx"]
 @app.route("/",methods=["GET","POST"])
 def signPage():
     correct_user=None
@@ -195,12 +195,6 @@ def signPage():
 @app.route("/dashboard")
 def dashBoard():
     status=Employee.query.with_entities(Employee.Employment_status).distinct()
-    # for stat in status:
-    #     count = Employee.query.filter_by(Employment_status=stat.Employment_status).count()
-    #     print(f"Count for {stat.Employment_status}: {count}")
-    # joining_dates = Employee.query.with_entities(Employee.Joining_date).all()
-    # print(f"Joining dates: {joining_dates}")
-    
     del_employers=Delete_user.query.all()
     deleted_jan_employers=[]
     deleted_feb_employers=[]
@@ -261,9 +255,7 @@ def dashBoard():
     for employee in employers:
         if employee.Joining_date:
             split_date = employee.Joining_date.split('-')
-            modified_month =split_date[1]
-            # print("split dates")
-            # print(modified_month)            
+            modified_month =split_date[1]            
             if modified_month =="01":
                 jan_employers.append(employee.Name)  
             if modified_month =="02":
@@ -288,8 +280,7 @@ def dashBoard():
                nov_employers.append(employee.Name)
             if modified_month=='12':
                dec_employers.append(employee.Name)               
-    # print("june employers..")
-    # print(june_employers)
+
 
     employment_status_counts={}
     for stat in status:
@@ -326,7 +317,7 @@ def Add():
         else:
             formatted_date = None 
             experience=None
-        # experience = request.form.get("experience")
+        
         location = request.form.get("location")
         last_promoted = request.form.get("last_promoted")
         comments = request.form.get("comments")
@@ -378,7 +369,7 @@ def Update(sno):
         else:
             formatted_date = None 
             experience=None            
-        # experience = request.form.get("experience")
+        
         location = request.form.get("location")
         last_promoted = request.form.get("last_promoted")
         comments = request.form.get("comments")
@@ -508,8 +499,9 @@ def register():
 @app.route("/get_employees_list/<employment_status>")
 def get_employees_list(employment_status):
     employees=Employee.query.filter_by(Employment_status=employment_status).all()
-    employee_names=[employee.Name for employee in employees]
-    return jsonify({'employeeList': employee_names})
+    return render_template('employee_list.html', employees=employees,employment_status=employment_status)
+    # employee_names=[employee.Name for employee in employees]
+    # return jsonify({'employeeList': employee_names})
 
 @app.route("/resume",methods=["GET","POST"])
 def resume():
@@ -578,13 +570,20 @@ def introCall(resume_id):
     resume=Resume.query.get(resume_id)
     if request.method == 'POST':
         
-        # print(resume_id)
+        
         date=request.form["date"]
         status=request.form["status"]
         comments=request.form["comments"]
         selected_panel=request.form["selectedPanel"]
-        entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
-        db.session.add(entry)
+        existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+        if existing_entry:
+            existing_entry.Date = date
+            existing_entry.Status = status
+            existing_entry.Comments = comments
+            existing_entry.SelectedPanel = selected_panel
+        else:    
+            entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+            db.session.add(entry)
         db.session.commit()
     return render_template("intro.html",resume=resume)
 
@@ -619,8 +618,15 @@ def interview1v(resume_id):
         status=request.form["status"]
         
         selected_panel=request.form["selectedPanel"]
-        entry=Interview1(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
-        db.session.add(entry)
+        existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
+        if existing_entry:
+            existing_entry.Date = date
+            existing_entry.Status = status
+            existing_entry.Comments = comments
+            existing_entry.SelectedPanel = selected_panel
+        else:    
+            entry=Interview1(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+            db.session.add(entry)
         db.session.commit()
     resume = Resume.query.get(resume_id)
     return render_template("interview1.html", resume=resume)
@@ -634,8 +640,15 @@ def interview2v(resume_id):
         comments=request.form["comments"]
         status=request.form["status"]
         selected_panel=request.form["selectedPanel"]
-        entry=Interview2(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
-        db.session.add(entry)
+        existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
+        if existing_entry:
+            existing_entry.Date = date
+            existing_entry.Status = status
+            existing_entry.Comments = comments
+            existing_entry.SelectedPanel = selected_panel
+        else:    
+            entry=Interview2(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+            db.session.add(entry)
         db.session.commit()
     return render_template("interview2.html",resume=resume)
 
@@ -647,8 +660,15 @@ def hr(resume_id):
         comments=request.form["comments"]
         status=request.form["status"]
         selected_panel=request.form["selectedPanel"]
-        entry=Hr(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
-        db.session.add(entry)
+        existing_entry=Hr.query.filter_by(resumeId=resume.id).first()
+        if existing_entry:
+            existing_entry.Date = date
+            existing_entry.Status = status
+            existing_entry.Comments = comments
+            existing_entry.SelectedPanel = selected_panel
+        else:     
+            entry=Hr(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+            db.session.add(entry)
         db.session.commit()
     return render_template("hr.html",resume=resume)
 
@@ -657,10 +677,18 @@ def get_intro_status(resume_id):
     intro=Intro.query.filter_by(resumeId=resume_id).first()
     interview1=Interview1.query.filter_by(resumeId=resume_id).first()
     interview2=Interview2.query.filter_by(resumeId=resume_id).first()
+    hr=Hr.query.filter_by(resumeId=resume_id).first()
     intro_status=intro.Status if intro else "Intro call not conducted"
     interview1_status=interview1.Status if interview1 else "Interview 1 not conducted"
     interview2_status=interview2.Status if interview2 else "Interview 2 not conducted"
-    return jsonify({'intro_status':intro_status,'interview1_status': interview1_status,'interview2_status':interview2_status}) 
+    hr_status=hr.Status if hr else "Hr not conducted"
+    all_rounds_status="cleared" if all([intro, interview1, interview2, hr]) else "Not cleared"
+    return jsonify({'intro_status':intro_status,'interview1_status': interview1_status,'interview2_status':interview2_status,'hr_status':hr_status, 'all_rounds_status': all_rounds_status}) 
+
+@app.route("/employee_data")
+def employeeData():
+    data=Employee.query.all()
+    return render_template("employee_data.html",data=data)
 
 if __name__ == "__main__":
     app.run(debug=True)
