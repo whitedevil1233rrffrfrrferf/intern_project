@@ -1,4 +1,7 @@
-
+*{
+    font-family:"poppins";
+    
+}
 a{
     text-decoration: none;
     color:red;
@@ -13,10 +16,10 @@ a{
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 10px;
+    
 }
 .filters_title{
-    background-color:#1AACAC;
+    background-color:#00ACFF;
     color:white;
     text-align: center;
     margin: 0;
@@ -28,12 +31,9 @@ a{
     color:#00A9FF;
     
 }
-.table.table{
-    background-color:#1AACAC;
-    border-spacing:40px;
-}
+
 .table .table_header {
-    background-color:#1AACAC;
+    background-color:#00ACFF;
     color:white;
     }
     .table.table-primary {
@@ -85,7 +85,7 @@ tbody tr.resigned-row {
 }
 .sidemenu_items:hover{
     transform: scale(0.9);
-    backface-visibility: hidden;
+    
 }
 .icon{
     margin-right:30px;
@@ -97,7 +97,35 @@ tbody tr.resigned-row {
 }
 .first_div{
     display: flex;
+    justify-content: space-between;
 }  
 a:hover {
     color: #007bff; 
+}
+.poppins{
+    font-family:"poppins"
+}
+
+.icons{
+    color: black;
+}
+.icons:hover{
+    color: grey;
+    transform: scale(1.2);
+}
+.filter_div{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+.add_a_filter_div{
+    margin-top: ;
+}
+.filters_div{
+    padding: 40px;
+}
+select{
+    width:90px;
 }

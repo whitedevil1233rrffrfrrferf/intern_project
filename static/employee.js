@@ -1,4 +1,5 @@
-function getInterviewStatus(resumeId){
+function getInterviewStatus(event,resumeId){
+    event.preventDefault();
     var curDisplayStyle=document.getElementById(`toggle${resumeId}`).style.display;
     document.getElementById(`toggle${resumeId}`).style.display=curDisplayStyle==="none"?"":"none"
     fetch(`/get_interview_status/${resumeId}`)
@@ -187,3 +188,40 @@ function submitLocation(resumeId) {
     document.getElementById('div_location' + resumeId).innerHTML = enteredLocation;
     localStorage.setItem('enteredLocation' + resumeId, enteredLocation);
 }
+function showContactInput(resumeId) {
+    document.getElementById('btn_contact' + resumeId).style.display = 'none';
+    document.getElementById('contact' + resumeId).style.display = 'block';
+    document.getElementById('submitBtnContact' + resumeId).style.display = 'block';
+}
+
+function submitContact(resumeId) {
+    document.getElementById('btn_contact' + resumeId).style.display = 'none';
+    document.getElementById('submitBtnContact' + resumeId).style.display = 'none';
+    document.getElementById('contactInput' + resumeId).style.display = 'none';
+    var enteredContact = document.getElementById('contactInput' + resumeId).value;
+    document.getElementById('div_contact' + resumeId).style.display = 'block';
+    document.getElementById('div_contact' + resumeId).innerHTML = enteredContact;
+    localStorage.setItem('enteredContact' + resumeId, enteredContact);
+}
+function populateSelectOptions(selectId, optionsArray) {
+    var selectElement = document.getElementById(selectId);
+    optionsArray.forEach(function(option) {
+        var optionElement = document.createElement("option");
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
+        selectElement.appendChild(optionElement);
+    });
+}
+
+populateSelectOptions("introFilter", config.resumeFilters.introCallStatus);
+populateSelectOptions("interview1Filter", config.resumeFilters.interview1Status);
+populateSelectOptions("interview2Filter", config.resumeFilters.interview2Status);
+populateSelectOptions("allRoundsFilter", config.resumeFilters.allRoundsStatus);
+
+setTimeout(function(){
+    var flashMessages =document.querySelectorAll(".add_flash_message")
+    flashMessages.forEach(function(flashMessage) {
+        flashMessage.style.display = 'none';
+      });
+    }, 2000);
+localStorage.clear()

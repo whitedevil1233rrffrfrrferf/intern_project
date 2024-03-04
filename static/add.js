@@ -1,14 +1,16 @@
-// const joiningDateInput = document.getElementById("joining_date");
 
-// joiningDateInput.addEventListener("change", function () {
-//     const selectedDateTime = joiningDateInput.value;
+function populateSelectOptions(selectId, optionsArray){
+    var selectElement=document.getElementById(selectId);
+    optionsArray.forEach(function(option){
+        var optionElement=document.createElement("option")
+        optionElement.value=option;
+        optionElement.textContent=option;
+        selectElement.appendChild(optionElement)
+    });
+}
+populateSelectOptions("designation", config.add.designations);
+populateSelectOptions("project", config.add.projects);
+populateSelectOptions("employment_status", config.add.employmentStatus);
+populateSelectOptions("location", config.add.locations);
+populateSelectOptions("status", config.add.statuses);
 
-//     // Split the date and time parts
-//     const [datePart, timePart] = selectedDateTime.split('T');
-//     // Split the date into year, month, and day
-//     const [year, month, day] = datePart.split('-');
-//     // Format the date as dd/mm/yyyy
-//     const formattedValue = `${day}/${month}/${year}`;
-
-//     joiningDateInput.value = formattedValue;
-// });

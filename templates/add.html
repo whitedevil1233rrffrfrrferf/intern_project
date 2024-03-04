@@ -10,28 +10,30 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
   </head>
   <body>
-    <h1 class="title"><center>Add a new Employee</center></h1>
-    <div class="container my-3">
-        <form action="/add" method="post" id="form_id">
+    
+    <div style="display: flex;">
+      {% include 'sidemenu.html' %}
+      <div class="container my-3" style="width:60%;">
+        <h1 class="title"><center>Add a new Employee</center></h1>
+        <form action="/add" method="post" id="form_id"  >
             <div class="mb-3 label">
-              <label for="emp_id" class="form-label">Emp_id:</label>
-              <input type="text" class="form-control" id="emp_id" name="emp_id" aria-describedby="emailHelp">
+              <label for="emp_id" class="form-label">Emp_id <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+              <input type="text" class="form-control" id="emp_id" name="emp_id" aria-describedby="emailHelp" required>
               
             </div>
             <div class="mb-3 label">
-              <label for="name" class="form-label">Name:</label>
-              <input type="text" class="form-control" name="name" id="name">
+              <label for="name" class="form-label">Name: <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+              <input type="text" class="form-control" name="name" id="name" required>
             </div>
             <!-- <div class="mb-3">
                 <label for="designation" class="form-label">Designation:</label>
                 <input type="text" class="form-control" name="designation" id="designation">
             </div> -->
             <div class="mb-3 label">
-              <label for="designation" class="form-label">Designation:</label>
-              <select name="designation" data-target="otherProjectField" class="form-select toggle-dropdown">
-                  <option value="Designation 1">Designation 1</option>
-                  <option value="Designation 2">Designation 2</option>
-                  <option value="Designation 3">Designation 3</option>
+              <label for="designation" class="form-label">Designation <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+              <select name="designation" data-target="otherProjectField" class="form-select toggle-dropdown" id="designation" required>
+                <option value="">Select</option>
+                 
               </select>
             </div>
             <div class="mb-3 label">
@@ -43,11 +45,9 @@
                 <input type="text" class="form-control" name="project" id="project">
             </div>    -->
             <div class="mb-3 label">
-              <label for="project" class="form-label">Project:</label>
-              <select name="project" data-target="otherProjectField" class="form-select toggle-dropdown">
-                  <option value="Project 1">Project 1</option>
-                  <option value="Project 2">Project 2</option>
-                  <option value="Project 3">Project 3</option>
+              <label for="project" class="form-label">Project <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+              <select name="project" data-target="otherProjectField" class="form-select toggle-dropdown" id="project" required>
+                <option value="">Select</option>
               </select>
             </div>
             <div class="mb-3 label">
@@ -59,31 +59,23 @@
                 <input type="text" class="form-control" name="employment_status" id="employment_status">
             </div>  -->
             <div class="mb-3 label">
-              <label for="employment_status" class="form-label">Employment status:</label>
-              <select name="employment_status" data-target="otherProjectField" class="form-select toggle-dropdown">
-                <option value="Billable">Billable</option>
-                <option value="Maternity">Maternity</option>
-                <option value="Trainee">Trainee</option>
-                <option value="Backup">Backup</option>
-                <option value="Bench">Bench</option>
-                <option value="Long term leave">Long term leave</option>
+              <label for="employment_status" class="form-label">Employment status<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+              <select name="employment_status" data-target="otherProjectField" class="form-select toggle-dropdown" id="employment_status" required>
+                <option value="">Select</option>
               </select>
             </div>
             <div class="mb-3 label">
-                <label for="joining_date" class="form-label">Joining_date:</label>
-                <input type="date" class="form-control"  name="joining_date" id="joining_date">
+                <label for="joining_date" class="form-label">Joining_date: <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <input type="date" class="form-control"  name="joining_date" id="joining_date" required>
             </div> 
             <!-- <div class="mb-3">
                 <label for="experience" class="form-label">Experience:</label>
                 <input type="text" class="form-control" name="experience" id="experience">
             </div>  -->
             <div class="mb-3 label">
-                <label for="location" class="form-label">Location:</label>
-                <select name="location" data-target="otherLocationField" class="form-select toggle-dropdown">
-                  <option value="Kollu">Kollu</option>
-                  <option value="Kaup">Kaup</option>
-                  <option value="Chennai">Chennai</option>
-                  <option value="TN palyam">TN palyam</option>
+                <label for="location" class="form-label">Location <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <select name="location" data-target="otherLocationField" class="form-select toggle-dropdown" id="location" required>
+                  <option value="">Select</option>
                 </select>
             </div> 
             
@@ -96,16 +88,15 @@
                 <input type="text" class="form-control" name="comments" id="comments">
             </div> 
             <div class="mb-3 label">
-              <label for="status" class="form-label">Status:</label>
-              <select name="status" data-target="otherStatusField" class="form-select toggle-dropdown">
-                <option value="active">Active</option>
-                <option value="resigned">Resigned</option>
+              <label for="status" class="form-label">Status <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+              <select name="status" data-target="otherStatusField" class="form-select toggle-dropdown" id="status" required>
+                <option value="">Select</option>
                 
             </select>
           </div> 
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
-          <a class="btn btn-primary" href="/home" style="color:white; padding:10px ;margin-top:30px; margin-left:570px;"><div style="display: flex; justify-content: space-between; padding:5px;">
+          <a class="btn btn-primary" href="/home" style="color:white; padding:10px ;margin-top:30px; margin-left:400px;"><div style="display: flex; justify-content: space-between; padding:5px;">
             <div>
               <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
             </div>
@@ -113,9 +104,12 @@
               Back
             </div>
           </div></a>
-    </div> 
+    </div>
+    </div>
+     
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='config.js') }}"></script>
     <script src="{{ url_for('static', filename='add.js') }}"></script>  
   </body>
 </html>

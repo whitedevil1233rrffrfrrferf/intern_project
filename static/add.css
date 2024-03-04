@@ -2,6 +2,7 @@
     margin:0;
     padding: 0;
     
+    
 }
 .label{
     font-size:20px;
@@ -11,6 +12,6 @@
     background-color:#9EDDFF
 }
 .title{
-    background-color:#1AACAC;
+   background-color:#00A9FF;
     color:white;
 }

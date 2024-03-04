@@ -1,18 +1,38 @@
-.month{
-    margin-bottom:20px;
+*{
+    font-family:"poppins";
+
+    
 }
-.month h1{
-    background-color:#1AACAC;
-    color:white
+.content{
+    background-color: white;
+    
+    
 }
-.filter{
-    display:flex;
-    align-items: center;
+.icon{
+    color:black;
+}
+.card{
+    background-color:#00A9FF;
+    border:1px solid white;
+    box-shadow:0 4px 8px rgba(0,0,0, 0.1);
+    color: white;
+    width:25rem;
+}
+.card-body{
     text-align: center;
-    margin-left:600px;
-    margin-bottom: 30px;
+    padding: 5px;
 }
-.filter_title{
-    margin-right: 20px;
-    text-align: center;
+.card-text{
+    font-size:18px;
+}
+.card:hover{
+    background-color: grey;
+    transition:0.3s;
+}
+
+.icons{
+    color: white;
+}
+.sidemenu{
+    
 }

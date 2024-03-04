@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,jsonify,send_from_directory
+from flask import Flask, render_template,request,redirect,url_for,jsonify,send_from_directory,session,flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import extract,func,or_
 from sqlalchemy.sql.expression import extract
@@ -11,7 +11,18 @@ from werkzeug.utils import secure_filename
 import os
 import zipfile
 import shutil
+import subprocess
+import json
+from flask import current_app
 app = Flask(__name__)
+profile_images_upload_folder = 'static/profile_images'
+if not os.path.exists(profile_images_upload_folder):
+    os.makedirs(profile_images_upload_folder)
+
+general_upload_folder = 'static/files'
+if not os.path.exists(general_upload_folder):
+    os.makedirs(general_upload_folder)    
+app.config['SECRET_KEY'] = 'test'
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///employer.db"
 app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
                                 'delete_user':"sqlite:///delete.db",
@@ -23,8 +34,8 @@ app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
                                 }
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['UPLOAD_FOLDER']='static/files'
-
+app.config['UPLOAD_FOLDER']=general_upload_folder
+app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
 db = SQLAlchemy(app)
 
 class Employee(db.Model):
@@ -49,7 +60,10 @@ class Login(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     email=db.Column(db.String(500))
     password=db.Column(db.String(200))
-    
+    Role=db.Column(db.String(200))
+    Name = db.Column(db.String(200))
+    MobileNumber = db.Column(db.String(20))
+    photo_filename = db.Column(db.String(255))
 class Delete_user(db.Model):
     __bind_key__="delete_user"
     id=db.Column(db.Integer,primary_key=True) 
@@ -175,6 +189,30 @@ def allowed_file(filename):
 
 def allowed_files(filename):
     return "." in filename and filename.rsplit(".",1)[1].lower() in ["pdf" , "csv","doc","docx"]
+
+def dashboard_function():
+    total_employees=Employee.query.count()
+    active_employees = Employee.query.filter_by(employee_status='active').count()
+    resigned_employees=Employee.query.filter_by(employee_status='resigned').count()
+    total_resumes=Resume.query.count()
+    hr_selected=Hr.query.filter_by(Status='Move to HR process').count()
+    current_year = datetime.now().year
+    last_year = current_year - 1
+    
+    
+    current_year_count = Employee.query.filter(Employee.Joining_date.like(f'%-{current_year}')).count()
+    
+    
+    last_year_count = Employee.query.filter(Employee.Joining_date.like(f'%-{last_year}')).count()
+    Chennai_employees_count=Employee.query.filter_by(Location='Chennai').count()
+    kollu_employees_count=Employee.query.filter_by(Location='Kollumangudi').count()
+    kaup_employees_count=Employee.query.filter_by(Location='Kaup').count()
+    tn_palyam_count=Employee.query.filter_by(Location='TN Palayam').count()
+    return total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count
+@app.context_processor
+def inject_total_employees():
+    total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count=dashboard_function()
+    return dict(total_employees=total_employees,active_employees=active_employees,resigned_employees=resigned_employees,total_resumes=total_resumes,hr_selected=hr_selected,current_year_count=current_year_count, last_year_count=last_year_count,Chennai_employees_count=Chennai_employees_count,kollu_employees_count=kollu_employees_count,kaup_employees_count=kaup_employees_count,tn_palyam_count=tn_palyam_count)
 @app.route("/",methods=["GET","POST"])
 def signPage():
     correct_user=None
@@ -182,9 +220,11 @@ def signPage():
     if request.method=="POST":
         email=request.form["email"]
         password=request.form["password"]
+        
         correct_user=Login.query.filter_by(email=email).first()
         if correct_user:
             if correct_user.password==password:
+                session['email'] = email 
                 return redirect(url_for("dashBoard"))
             else:
                 correct_user=None
@@ -195,104 +235,29 @@ def signPage():
 @app.route("/dashboard")
 def dashBoard():
     status=Employee.query.with_entities(Employee.Employment_status).distinct()
-    del_employers=Delete_user.query.all()
-    deleted_jan_employers=[]
-    deleted_feb_employers=[]
-    deleted_march_employers=[]
-    deleted_april_employers=[]
-    deleted_may_employers=[]
-    deleted_june_employers=[]
-    deleted_july_employers=[]
-    deleted_aug_employers=[]
-    deleted_sep_employers=[]
-    deleted_oct_employers=[]
-    deleted_nov_employers=[]
-    deleted_dec_employers=[]
-    for emp in del_employers:
-        if emp.Date:
-            split_date=emp.Date.split("-")
-            modified_month=split_date[1]
-            if modified_month=="01":
-                deleted_jan_employers.append(emp.Name) 
-            if modified_month=="02":
-                deleted_feb_employers.append(emp.Name) 
-            if modified_month=="03":
-                deleted_march_employers.append(emp.Name)
-            if modified_month=="04":
-                deleted_april_employers.append(emp.Name)
-            if modified_month=="05":
-                deleted_may_employers.append(emp.Name)                   
-            if modified_month=="06":
-                deleted_june_employers.append(emp.Name)
-            if modified_month=="07":
-                deleted_july_employers.append(emp.Name) 
-            if modified_month=="08":
-                deleted_aug_employers.append(emp.Name)
-            if modified_month=="09":
-                deleted_sep_employers.append(emp.Name)  
-            if modified_month=='10':
-                deleted_oct_employers.append(emp.Name)  
-            if modified_month=='11':
-                deleted_nov_employers.append(emp.Name)         
-            if modified_month=='12':
-                deleted_dec_employers.append(emp.Name)           
-                 
-                
-                
-    employers = Employee.query.all()
-    jan_employers=[]
-    feb_employers=[]
-    march_employers=[]
-    april_employers=[]
-    may_employers=[]
-    june_employers=[]
-    july_employers=[]
-    aug_employers=[]
-    sep_employers=[]
-    oct_employers=[]
-    nov_employers=[]
-    dec_employers=[]
-    for employee in employers:
-        if employee.Joining_date:
-            split_date = employee.Joining_date.split('-')
-            modified_month =split_date[1]            
-            if modified_month =="01":
-                jan_employers.append(employee.Name)  
-            if modified_month =="02":
-                feb_employers.append(employee.Name)    
-            if modified_month =="03":
-                march_employers.append(employee.Name)
-            if modified_month =="04":
-                april_employers.append(employee.Name)           
-            if modified_month =="05":
-                may_employers.append(employee.Name)
-            if modified_month=='06':
-               june_employers.append(employee.Name) 
-            if modified_month=='07':
-               july_employers.append(employee.Name)      
-            if modified_month=='08':
-               aug_employers.append(employee.Name) 
-            if modified_month=='09':
-               sep_employers.append(employee.Name)
-            if modified_month=='10':
-               oct_employers.append(employee.Name)
-            if modified_month=='11':
-               nov_employers.append(employee.Name)
-            if modified_month=='12':
-               dec_employers.append(employee.Name)               
+                   
 
-
+    
     employment_status_counts={}
     for stat in status:
         count=Employee.query.filter_by(Employment_status=stat.Employment_status).count()
         
         employment_status_counts[stat.Employment_status]=count
-    return render_template("dashboard.html",employment_status_counts=employment_status_counts,june_employers=june_employers,deleted_june_employers=deleted_june_employers,deleted_jan_employers=deleted_jan_employers,deleted_feb_employers=deleted_feb_employers,deleted_march_employers=deleted_march_employers,deleted_april_employers=deleted_april_employers,deleted_may_employers=deleted_may_employers,deleted_july_employers=deleted_july_employers,deleted_aug_employers=deleted_aug_employers,deleted_sep_employers=deleted_sep_employers,deleted_oct_employers=deleted_oct_employers,deleted_nov_employers=deleted_nov_employers,deleted_dec_employers=deleted_dec_employers,jan_employers=jan_employers,feb_employers=feb_employers,march_employers=march_employers,april_employers=april_employers,may_employers=may_employers,july_employers=july_employers,aug_employers=aug_employers,sep_employers=sep_employers,oct_employers=oct_employers,nov_employers=nov_employers,dec_employers=dec_employers) 
-@app.route("/home")
+    return render_template("dashboard.html",employment_status_counts=employment_status_counts) 
+@app.route("/home",methods=["GET","POST"])
 def Home():
-    data=Employee.query.all()
+    pages=20
+    if request.method=="POST":
+        pages=int(request.form["page"])
+        print(pages)
+            
+    # data=Employee.query.all()
+    # return render_template("index.html",data=data)
+    page=request.args.get('page',1,type=int)
+    data=Employee.query.paginate(page=page,per_page=pages)
+    
     return render_template("index.html",data=data)
-
+    
 @app.route("/add", methods=["GET", "POST"])
 def Add():
     if request.method == "POST":
@@ -323,6 +288,8 @@ def Add():
         comments = request.form.get("comments")
         employee_status=request.form.get("status")
         existing_data=Employee.query.filter_by(Name=name).first()
+        if existing_data:
+            flash(f'Employee {name} already exists!', 'error')
         if not existing_data:
             employee = Employee(
                 Emp_id=emp_id,
@@ -341,6 +308,7 @@ def Add():
             )
             db.session.add(employee)
             db.session.commit()
+            flash(f'Added {name} successfully!', 'success')
         return redirect("/home")
     return render_template("add.html")
 
@@ -390,6 +358,7 @@ def Update(sno):
         employee.employee_status=employee_status
         db.session.add(employee)
         db.session.commit()
+        flash(f'{name} updated successfully!', 'success')
         return redirect("/home")
     employee=Employee.query.filter_by(Sno=sno).first()
     return render_template("update.html",employee=employee,selected_date=selected_date)
@@ -405,7 +374,7 @@ def Delete(sno):
     return redirect("/home")
 with app.app_context():
         db.create_all()
-        data=extract_data_from_excel()
+        # data=extract_data_from_excel()
 
 @app.route("/bulk",methods=["GET","POST"])
 def bulk():
@@ -413,71 +382,78 @@ def bulk():
         file = request.files['file']
         if file and allowed_file(file.filename):
             if file.filename.endswith(".xlsx"):
-                wb=load_workbook(file)
-                ws=wb.active
-                column_mappings = {
-                    'Sno': 0,
-                    'Emp_id': 1,
-                    'Name': 2,
-                    'Designation': 3,
-                    'Department': 4,
-                    'Project': 5,
-                    'Job_role': 6,
-                    'Employment_status': 7,
-                    'Joining_date': 8,
-                    'Experience': 9,
-                    'Location': 10,
-                    'Last_promoted': 11,
-                    'Comments': 12
-                    }
-                for row in ws.iter_rows (min_row=2,values_only=True):
-                    if not all(cell is None for cell in row):
-                        
-                        Emp_id = row[column_mappings['Emp_id']]
-                        Name = row[column_mappings['Name']]
-                        Designation = row[column_mappings['Designation']]
-                        Department = row[column_mappings['Department']]
-                        Project = row[column_mappings['Project']]
-                        Job_role = row[column_mappings['Job_role']]
-                        Employment_status = row[column_mappings['Employment_status']]
-                        Joining_date = row[column_mappings['Joining_date']]
-                        Experience = row[column_mappings['Experience']]
-                        formatted_date = None
-                        if isinstance(Joining_date,datetime):
-                            join_date=Joining_date
-                            formatted_date=join_date.strftime("%d-%m-%Y")
-                            month=join_date.month
-                            day=join_date.day
-                            year=join_date.year
-                            current_date=date.today()
-                            Experience=current_date.year-year
-                            if (current_date.month,current_date.day) < (month,day):
-                                Experience-=1
-                            if Experience < 1:
-                                Experience="Less than 1 year"
-                        else:
-                            join_date = None
-                            day = None
-                            month = None
-                            year = None
-                            Experience = None
-
-                 
-                        Location = row[column_mappings['Location']]
-                        Last_promoted = row[column_mappings['Last_promoted']]
-                        Comments = row[column_mappings['Comments']]
-                        employee_status="active"
-                        existing_data=Employee.query.filter_by(Name=Name).first()
-                        if not existing_data:
-                            employee = Employee(Emp_id=Emp_id, Name=Name, Designation=Designation,
-                                    Department=Department, Project=Project, Job_role=Job_role,
-                                    Employment_status=Employment_status, Joining_date=formatted_date,
-                                    Experience=Experience, Location=Location, Last_promoted=Last_promoted,
-                                    Comments=Comments,employee_status=employee_status)
-                            db.session.add(employee)
-                db.session.commit()
-                return redirect("/home")            
-
+                try:
+                    wb=load_workbook(file)
+                    ws=wb.active
+                    column_mappings = {
+                        'Sno': 0,
+                        'Emp_id': 1,
+                        'Name': 2,
+                        'Designation': 3,
+                        'Department': 4,
+                        'Project': 5,
+                        'Job_role': 6,
+                        'Employment_status': 7,
+                        'Joining_date': 8,
+                        'Experience': 9,
+                        'Location': 10,
+                        'Last_promoted': 11,
+                        'Comments': 12
+                        }
+                    for row in ws.iter_rows (min_row=2,values_only=True):
+                        if not all(cell is None for cell in row):
+                            
+                            Emp_id = row[column_mappings['Emp_id']]
+                            Name = row[column_mappings['Name']]
+                            Designation = row[column_mappings['Designation']]
+                            Department = row[column_mappings['Department']]
+                            Project = row[column_mappings['Project']]
+                            Job_role = row[column_mappings['Job_role']]
+                            Employment_status = row[column_mappings['Employment_status']]
+                            Joining_date = row[column_mappings['Joining_date']]
+                            Experience = row[column_mappings['Experience']]
+                            if Experience is None or Experience == "":
+                                formatted_date = None
+                                if isinstance(Joining_date, datetime):
+                                    join_date = Joining_date
+                                    formatted_date = join_date.strftime("%d-%m-%Y")
+                                    month = join_date.month
+                                    day = join_date.day
+                                    year = join_date.year
+                                    current_date = date.today()
+                                    Experience = current_date.year - year
+                                    if (current_date.month, current_date.day) < (month, day):
+                                        Experience -= 1
+                                    if Experience < 1:
+                                        Experience = "Less than 1 year"
+                                else:
+                                    # If Joining_date is not a datetime object, set Experience to None
+                                    Experience = None
+                            else:
+                                # If Experience is provided, keep formatted_date as is
+                                formatted_date = Joining_date.strftime("%d-%m-%Y") if isinstance(Joining_date, datetime) else None
+                    
+                            Location = row[column_mappings['Location']]
+                            Last_promoted = row[column_mappings['Last_promoted']]
+                            Comments = row[column_mappings['Comments']]
+                            employee_status="active"
+                            existing_data=Employee.query.filter_by(Name=Name).first()
+                            if existing_data:
+                                flash( f'Employee {Name} aldready exists', 'error')
+                            if not existing_data:
+                                employee = Employee(Emp_id=Emp_id, Name=Name, Designation=Designation,
+                                        Department=Department, Project=Project, Job_role=Job_role,
+                                        Employment_status=Employment_status, Joining_date=formatted_date,
+                                        Experience=Experience, Location=Location, Last_promoted=Last_promoted,
+                                        Comments=Comments,employee_status=employee_status)
+                                db.session.add(employee)
+                                flash('File uploaded successfully!', 'success')
+                    db.session.commit()
+                    
+                    return redirect("/home")            
+                except Exception as e:
+                    flash(f'Error: {e}', 'error')
+                    return redirect("/bulk")
     
     return render_template("bulk.html")
     
@@ -490,7 +466,18 @@ def register():
     if request.method=="POST":
         email=request.form["email"]
         password=request.form["password"]
-        user=Login(email=email,password=password)
+        role = request.form["role"]
+        name=request.form["name"]
+        mobile=request.form["mobile"]
+        filename=""
+        if 'photo' in request.files:
+            photo=request.files['photo']
+            if photo.filename!='':
+                filename=secure_filename(photo.filename)
+                print(filename)
+                file_path=os.path.join(app.config['PROFILE_IMAGE_UPLOAD_FOLDER'],filename)
+                photo.save(file_path)
+        user=Login(email=email,password=password,Role=role,Name=name,MobileNumber=mobile,photo_filename=filename)
         db.session.add(user)
         db.session.commit()
         return redirect("/")
@@ -515,15 +502,19 @@ def resume():
                 target_path=os.path.join(app.config['UPLOAD_FOLDER'],new_filename)
                 if not os.path.exists(target_path):
                     file.save(target_path)
+                    flash('Resume uploaded successfully!', 'success')
                     resume=Resume(filename=new_filename)
                     db.session.add(resume)
                     db.session.commit()
+                else:
+                     flash(f'{filename} aldready exists !', 'error')   
         return redirect(url_for('resume'))        
     return render_template("resume.html")
 
 @app.route("/employee_management")
 def employee():
-    resumes=Resume.query.all()
+    page=request.args.get('page',1,type=int)
+    resumes=Resume.query.paginate(page=page,per_page=10)
     return render_template("employee.html",resumes=resumes)
 
 @app.route("/view_resume/<filename>")
@@ -557,7 +548,9 @@ def zip():
                                     resume=Resume(filename=tag_filename)
                                     db.session.add(resume)
                                     db.session.commit()
-
+                                    flash('Resume uploaded successfully!', 'success')
+                                else:
+                                    flash('Resume already exists!', 'error')
                                     
                 finally:
                     shutil.rmtree(temp_dir)   
@@ -689,6 +682,82 @@ def get_intro_status(resume_id):
 def employeeData():
     data=Employee.query.all()
     return render_template("employee_data.html",data=data)
+
+@app.route("/profile")
+def profile():
+    email = session.get('email')
+    if email:
+        user=Login.query.filter_by(email=email).first()
+        emailId=user.email
+        password=user.password
+        role=user.Role
+        mobile=user.MobileNumber
+        name=user.Name
+        filename = user.photo_filename
+        return render_template("profile.html",emailId=emailId,password=password,role=role,name=name,mobile=mobile,filename=filename)
+
+@app.route("/get_role")
+def get_role():
+    email = session.get('email')
+    if email:
+        user=Login.query.filter_by(email=email).first()
+        role=user.Role
+        return jsonify({'role': role})
+@app.route("/signout")
+def signout():
+    session.pop('email', None)    
+    return redirect(url_for('signPage'))
+    
+
+
+@app.route('/edit_config')
+def edit_config():
+    return render_template("config_editor.html")
+    
+    # subprocess.run(['notepad', 'static/config.js'])  
+    # return 'File edited successfully'  
+
+@app.route("/update_profile", methods=["POST"])
+def update_profile():
+    email = session.get('email')
+    
+    if email:
+        user = Login.query.filter_by(email=email).first()
+        user.Name = request.form["name"]
+        
+        user.MobileNumber = request.form["mobile"]
+        user.password = request.form["password"]
+        # user.Role = request.form.get("role") 
+        
+        if 'photo' in request.files:
+            photo = request.files['photo']
+            if photo.filename != '':
+                # Delete previous photo if it exists
+                if user.photo_filename:
+                    previous_photo_path = os.path.join(app.config['PROFILE_IMAGE_UPLOAD_FOLDER'], user.photo_filename)
+                    if os.path.exists(previous_photo_path):
+                        os.remove(previous_photo_path)
+                # Save new photo
+                filename = secure_filename(photo.filename)
+                file_path = os.path.join(app.config['PROFILE_IMAGE_UPLOAD_FOLDER'], filename)
+                photo.save(file_path)
+                user.photo_filename = filename
+        db.session.commit()
+        return redirect("/profile")
+         
+@app.route('/update_config', methods=['POST'])
+def update_config():
+    try:
+        # Get the updated config data from the request
+        updated_config = request.get_json()
+
+        # Write the updated config data to the config.js file
+        with open('static/config.js', 'w') as config_file:
+            config_file.write(f'var config = {json.dumps(updated_config)};')
+
+        return jsonify({'message': 'Config updated successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500    
 
 if __name__ == "__main__":
     app.run(debug=True)

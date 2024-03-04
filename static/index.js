@@ -336,3 +336,59 @@ function filters(status) {
         }
     });
 }
+
+function populateSelectOptions(selectId, optionsArray){
+    var selectElement=document.getElementById(selectId);
+    optionsArray.forEach(function(option){
+        var optionElement=document.createElement("option")
+        optionElement.value=option;
+        optionElement.textContent=option;
+        selectElement.appendChild(optionElement)
+    });
+}
+populateSelectOptions("project", config.home.projects);
+populateSelectOptions("designation", config.home.designations);
+populateSelectOptions("employment_status", config.home.employment_statuses);
+populateSelectOptions("status", config.home.statuses);
+populateSelectOptions("location", config.home.locations);
+
+
+setTimeout(function(){
+    var flashMessages =document.querySelectorAll(".add_flash_message")
+    flashMessages.forEach(function(flashMessage) {
+        flashMessage.style.display = 'none';
+      });
+    }, 2000);
+
+document.getElementById("page").addEventListener('change',function(event){
+    
+    document.getElementById("pageForm").submit()
+    
+})    
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.pagination-link').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior (page refresh)
+            var page = this.getAttribute('data-page'); // Get the page number from data-page attribute
+
+            // Send AJAX request to fetch data for the clicked page
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/home?page=' + page, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // Update page content with the response
+                    var responseData = JSON.parse(xhr.responseText);
+                    document.body.innerHTML = responseData;
+                } else {
+                    // Handle error
+                    console.error('Request failed. Status: ' + xhr.status);
+                }
+            };
+            xhr.send();
+        });
+    });
+});
+
+

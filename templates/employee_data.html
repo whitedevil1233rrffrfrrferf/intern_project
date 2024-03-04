@@ -9,52 +9,26 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='employee.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
+    <style>
+      .table {
+            width: 100%;
+            table-layout: fixed; /* Fix the table layout */
+        }
+
+        .table td,
+        .table th {
+             /* Adjust padding as needed */
+            font-size: 14px; /* Adjust font size as needed */
+            white-space: nowrap; /* Prevent text wrapping */
+            overflow: hidden; /* Hide any overflowing content */
+            text-overflow: ellipsis; /* Show ellipsis for overflow */
+        }
+    </style>
 </head>
 <body>
-    <div class="first_div">
-        <div class="main_div" style="position:fixed; width:19rem; height:100vh; overflow-y: auto; z-index: 1000; ">
-          <i class="fa-solid fa-bars fa-2x main_icon"></i>
-              <a href="/home"><div class="sidemenu_items">
-                  <i class="fa-solid fa-house fa-2x icon"></i>
-                  <div style="width: 100%; height: 100%; color: white; font-size:35px; font-family: Inter; font-weight: 400; word-wrap: break-word">Home</div>
-                </div></a>
-              
-              <a href="/dashboard">
-                  <div class="sidemenu_items">
-                      <i class="fa-solid fa-list fa-2x icon"></i>
-                      <div style="width: 100%; height: 100%; color: white; font-size:35px; font-family: Inter; font-weight: 400; word-wrap: break-word">Dashboard</div>
-                    </div>
-              </a>
-        
-              <a href="/resume">
-                  <div class="sidemenu_items">
-                      <i class="fa-solid fa-file fa-2x icon"></i>
-                      <div style="width: 100%; height: 100%; color: white; font-size:35px; font-family: Inter; font-weight: 400; word-wrap: break-word">Resume upload</div>
-                    </div>
-              </a>
-        
-              <a href="/employee_management">
-                  <div class="sidemenu_items">
-                      <i class="fa-solid fa-user fa-2x icon"></i>
-                      <div style="width: 100%; height: 100%; color: white; font-size:35px; font-family: Inter; font-weight: 400; word-wrap: break-word">Resume Management</div>
-                    </div>
-              </a>
-
-              <a href="/employee_data">
-                <div class="sidemenu_items">
-                    <i class="fa-solid fa-user fa-2x icon"></i>
-                    <div style="width: 100%; height: 100%; color: white; font-size:35px; font-family: Inter; font-weight: 400; word-wrap: break-word">Employee Data</div>
-                  </div>
-                </a>
-        
-              <a href="/">
-                  <div class="sidemenu_items">
-                      <i class="fa-solid fa-right-from-bracket fa-2x icon"></i>
-                      <div style="width: 100%; height: 100%; color: white; font-size:35px; font-family: Inter; font-weight: 400; word-wrap: break-word">Logout</div>
-                    </div>
-              </a>
-        </div>
-        <div style="margin-left:350px ;">
+    <div class="first_div" >
+        {%include 'sidemenu.html'%}
+        <div style="margin-left:90px ;">
             <h1 class="title my-2"><center>Employee's Data</center></h1>
             <div class="table my-4">
                 <table class="table highlighted_row">
